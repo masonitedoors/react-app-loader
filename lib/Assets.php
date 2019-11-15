@@ -1,5 +1,4 @@
 <?php
-// phpcs:disable
 
 declare( strict_types = 1 );
 
@@ -15,7 +14,7 @@ class Assets {
 	 * Enqueue our react app assets.
 	 *
 	 * @param string $directory Root directory containing `src` and `build` directory.
-	 * @param array $opts {
+	 * @param array  $opts {.
 	 *     @type string $base_url Root URL containing `src` and `build` directory. Only needed for production.
 	 *     @type string $handle   Style/script handle. (Default is last part of directory name.)
 	 *     @type array  $scripts  Script dependencies.
@@ -46,7 +45,7 @@ class Assets {
 		}
 
 		if ( empty( $assets ) ) {
-			trigger_error( 'React App Loader: Unable to find React asset manifest.', E_USER_WARNING );
+			trigger_error( 'React App Loader: Unable to find React asset manifest.', E_USER_WARNING ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
 			return;
 		}
 
@@ -128,7 +127,7 @@ class Assets {
 	public static function get_assets_list( string $directory ) {
 		$directory = trailingslashit( $directory );
 
-		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory. 
+		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
 		$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
 
 		if ( $root_manifest ) {
@@ -137,10 +136,10 @@ class Assets {
 			$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
 		}
 
-		if ( ! empty( $assets  ) ) {
+		if ( ! empty( $assets ) ) {
 
 			if ( ! array_key_exists( 'entrypoints', $assets ) ) {
-				trigger_error( 'React App Loader: Entrypoints key was not found within your react app\'s asset-manifest.json. This may indicate that you are using an unsupported version of react-scripts. Your react app should be using react-scripts@3.2.0 or later.', E_USER_WARNING );
+				trigger_error( 'React App Loader: Entrypoints key was not found within your react app\'s asset-manifest.json. This may indicate that you are using an unsupported version of react-scripts. Your react app should be using react-scripts@3.2.0 or later.', E_USER_WARNING ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
 				return;
 			}
 
@@ -164,7 +163,7 @@ class Assets {
 	 */
 	public static function infer_base_url( string $path ) {
 		$path = wp_normalize_path( $path );
-		$url = trailingslashit( trailingslashit( plugins_url() ) . basename( $path ) );
+		$url  = trailingslashit( trailingslashit( plugins_url() ) . basename( $path ) );
 		return $url;
 	}
 

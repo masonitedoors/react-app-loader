@@ -16,6 +16,7 @@
 
   <rule ref="WordPress">
     <exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents" />
+    <exclude name="WordPress.WP.EnqueuedResourceParameters.MissingVersion" />
   </rule>
 
   <rule ref="WordPress-Extra">
