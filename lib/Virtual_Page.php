@@ -160,7 +160,9 @@ class Virtual_Page {
 	public function display_page_content() : void {
 		// Redirect user to homepage if they do not have permissions.
 		$user = wp_get_current_user();
-		if ( ! in_array( $this->role, (array) $user->roles, true ) ) {
+
+		// Redirect user to homepage if they do not have the required role and the React app does not explicity define `nopriv`.
+		if ( ! in_array( $this->role, (array) $user->roles, true ) && 'nopriv' !== $this->role ) {
 			wp_safe_redirect( home_url() );
 			exit;
 		}
