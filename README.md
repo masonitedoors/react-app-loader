@@ -148,11 +148,11 @@ Once implemented, our base styles will now be scoped under the root hashed compo
 
 ## Common Issues
 
-### I am getting a 404 when hitting the page slug I registered.
+__I am getting a 404 when hitting the page slug I registered.__
 
 Verify that your React app WordPress plugin has been activated. Your site's rewrite rules might not have been flushed or flushed properly. See [Flushing WordPress Rewrite Rules](#flushing-wordpress-rewrite-rules) for instructions.
 
-### I am able to hit the page slug I registered, but my React app is not loading.
+__I am able to hit the page slug I registered, but my React app is not loading.__
 
 This could be happening from a few things:
   
@@ -162,7 +162,7 @@ This could be happening from a few things:
 
 3.  The asset-manfiest.json could not be found at all within your React app. Most likely your React app was never built or the build failed.
 
-### I am being redirected to my site's homepage when trying to access the page slug I registered.
+__I am being redirected to my site's homepage when trying to access the page slug I registered.__
 
 This happens when your current WordPress user does not have the same role that was defined when registering with the loader.
 
