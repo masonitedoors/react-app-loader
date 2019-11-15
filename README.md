@@ -148,21 +148,21 @@ Once implemented, our base styles will now be scoped under the root hashed compo
 
 ## Common Issues
 
-**I am getting a 404 when hitting the page slug I registered.**
+> I am getting a 404 when hitting the page slug I registered.
 
 Verify that your React app WordPress plugin has been activated. Your site's rewrite rules might not have been flushed or flushed properly. See [Flushing WordPress Rewrite Rules](#flushing-wordpress-rewrite-rules) for instructions.
 
-**I am able to hit the page slug I registered, but my React app is not loading.**
+> I am able to hit the page slug I registered, but my React app is not loading.
 
 This could be happening from a few things:
+  
+1.  If your React app is using react router, you may need to specify a basename. This should be the exact same value as the slug registerd with the loader. See [Browser Router](https://github.com/ReactTraining/react-router/blob/master/packages/react-router-dom/docs/api/BrowserRouter.md).
 
-1. If your React app is using react router, you may need to specify a basename. This should be the exact same value as the slug registerd with the loader. See [Browser Router](https://github.com/ReactTraining/react-router/blob/master/packages/react-router-dom/docs/api/BrowserRouter.md).
+2.  The loader relies on the newer asset-manifest.json structure that was introduced in [create-react-app v3.2.0](https://github.com/facebook/create-react-app/releases/tag/v3.2.0). If your React app was built using an eariler version of create-react-app, you will need to update your React app.
 
-2. The loader relies on the newer asset-manifest.json structure that was introduced in [create-react-app v3.2.0](https://github.com/facebook/create-react-app/releases/tag/v3.2.0). If your React app was built using an eariler version of create-react-app, you will need to update your React app.
+3.  The asset-manfiest.json could not be found at all within your React app. Most likely your React app was never built or the build failed.
 
-3. The asset-manfiest.json could not be found at all within your React app. Most likely your React app was never built or the build failed.
-
-**I am being redirected to my site's homepage when trying to access the page slug I registered.**
+> I am being redirected to my site's homepage when trying to access the page slug I registered.
 
 This happens when your current WordPress user does not have the same role that was defined when registering with the loader.
 
