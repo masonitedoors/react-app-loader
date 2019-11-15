@@ -1,6 +1,6 @@
 # React App Loader
 
-[![React App Loader on Packagist](https://img.shields.io/packagist/v/masonitedoors/react-app-loader.svg?style=flat)](https://packagist.org/packages/masonitedoors/react-app-loader)
+[![React App Loader on Packagist](https://img.shields.io/packagist/v/masonitedoors/react-app-loader.svg?style=flat)](https://packagist.org/packages/masonitedoors/react-app-loader) [![Build Status](https://travis-ci.org/masonitedoors/react-app-loader.svg?branch=master)](https://travis-ci.org/masonitedoors/react-app-loader)
 
 > An mu-plugin that provides an API for loading React applications built with [create-react-app](https://github.com/facebook/create-react-app) into the front-end of WordPress.
 
