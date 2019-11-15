@@ -1,0 +1,22 @@
+{
+  "name": "masonitedoors/react-app-loader",
+  "description": "An mu-plugin that provides an API for loading React applications built with create-react-app into the front-end of WordPress.",
+  "type": "wordpress-muplugin",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.0",
+    "composer/installers": "^1.0"
+  },
+  "require-dev": {
+    "automattic/phpcs-neutron-standard": "dev-master",
+    "squizlabs/php_codesniffer": "dev-master",
+    "dealerdirect/phpcodesniffer-composer-installer": "dev-master",
+    "phpcompatibility/php-compatibility": "dev-master",
+    "wp-coding-standards/wpcs": "dev-master"
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpcs",
+    "fix": "./vendor/bin/phpcbf"
+  }
+}
