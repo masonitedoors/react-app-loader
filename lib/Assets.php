@@ -128,9 +128,16 @@ class Assets {
 	public static function get_assets_list( string $directory ) {
 		$directory = trailingslashit( $directory );
 
-		$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
+		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory. 
+		$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
 
-		if ( ! empty( $assets ) ) {
+		if ( $root_manifest ) {
+			$assets = self::load_asset_file( $directory . 'asset-manifest.json' );
+		} else {
+			$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
+		}
+
+		if ( ! empty( $assets  ) ) {
 
 			if ( ! array_key_exists( 'entrypoints', $assets ) ) {
 				trigger_error( 'React App Loader: Entrypoints key was not found within your react app\'s asset-manifest.json. This may indicate that you are using an unsupported version of react-scripts. Your react app should be using react-scripts@3.2.0 or later.', E_USER_WARNING );
@@ -138,8 +145,8 @@ class Assets {
 			}
 
 			$filtered_assets = array_map(
-				function( $value ) {
-					return "build/$value";
+				function( $value ) use ( $root_manifest ) {
+					return $root_manifest ? $value : "build/$value";
 				},
 				array_values( $assets['entrypoints'] )
 			);
