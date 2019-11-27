@@ -47,19 +47,28 @@ class Virtual_Page {
 	private $key;
 
 	/**
+	 * The callback.
+	 *
+	 * @var callable
+	 */
+	private $callback;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @param string $slug            The slug to tell WordPress to stop handling so react can handle routing.
-	 * @param string $root_id         The id of the root element we will be mounting our react app to.
-	 * @param string $plugin_dir_path The absolute path to the plugin directory that contains the react app.
-	 * @param string $role            The role required to view the page.
+	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
+	 * @param string   $root_id         The id of the root element we will be mounting our react app to.
+	 * @param string   $plugin_dir_path The absolute path to the plugin directory that contains the react app.
+	 * @param string   $role            The role required to view the page.
+	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 */
-	public function create( $slug, $root_id, $plugin_dir_path, $role ) {
+	public function create( $slug, $root_id, $plugin_dir_path, $role, $callback ) {
 		$this->slug            = $slug;
 		$this->root_id         = $root_id;
 		$this->plugin_dir_path = $plugin_dir_path;
 		$this->role            = $role;
 		$this->key             = "react_app_$slug";
+		$this->callback        = $callback;
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
@@ -168,9 +177,12 @@ class Virtual_Page {
 		}
 
 		$assets = new Assets();
-		$assets->enqueue(
-			$this->plugin_dir_path
-		);
+		$assets->enqueue( $this->plugin_dir_path );
+
+		// Fire our callback if one is defined.
+		if ( false !== $this->callback ) {
+			call_user_func( $this->callback );
+		}
 
 		// Display the current theme's header.
 		get_header();
