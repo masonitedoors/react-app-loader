@@ -29,6 +29,7 @@
     <exclude name="NeutronStandard.Functions.TypeHint.NoArgumentType" />
     <exclude name="NeutronStandard.Functions.TypeHint.NoReturnType" />
     <exclude name="NeutronStandard.StrictTypes.RequireStrictTypes.StrictTypes" />
+    <exclude name="NeutronStandard.Functions.DisallowCallUserFunc.CallUserFunc" />
     <exclude name="Squiz.Commenting.FileComment.Missing" />
     <exclude name="Squiz.Commenting.FileComment.MissingPackageTag" />
     <exclude name="Generic.Arrays.DisallowShortArraySyntax.Found" />

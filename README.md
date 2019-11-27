@@ -60,12 +60,13 @@ Example:
 
 The `register` method has 4 required parameters and should be called within the [`plugins_loaded`](https://codex.wordpress.org/Plugin_API/Action_Reference/plugins_loaded) action.
 
-| Parameter         | Type   | Description                                                                                                                                                                                                                                                                                                               |
-| :---------------- | :----- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| $slug            | string | The page slug where the React app will live on the site. The loader will also reserve this slug with WordPress, preventing any new posts from being made at the same URL. If any existing posts share the defined slug, they will not be able to be accessed on the front-end of the site once rewrite rules are flushed. |
-| $root_id         | string | The id of the root element that the React app should mount to. By default, Create React App has this as `'root'`.                                                                                                                                                                                                         |
-| $plugin_dir_path | string | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
-| $role            | string | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
+| Parameter         | Type     | Description                                                                                                                                                                                                                                                                                                               |
+| :---------------- | :-----   | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| $slug             | string   | The page slug where the React app will live on the site. The loader will also reserve this slug with WordPress, preventing any new posts from being made at the same URL. If any existing posts share the defined slug, they will not be able to be accessed on the front-end of the site once rewrite rules are flushed. |
+| $root_id          | string   | The id of the root element that the React app should mount to. By default, Create React App has this as `'root'`.                                                                                                                                                                                                         |
+| $plugin_dir_path  | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
+| $role             | string   | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
+| $callback         | callable | Optional callback function. This is only fired on the registered page before the React app assets are enqueued.                                                                                                                                                                                                           |
 
 ## Usage
 
@@ -155,7 +156,7 @@ Verify that your React app WordPress plugin has been activated. Your site's rewr
 __I am able to hit the page slug I registered, but my React app is not loading.__
 
 This could be happening from a few things:
-  
+
 1.  If your React app is using react router, you may need to specify a basename. This should be the exact same value as the slug registerd with the loader. See [Browser Router](https://github.com/ReactTraining/react-router/blob/master/packages/react-router-dom/docs/api/BrowserRouter.md).
 
 2.  The loader relies on the newer asset-manifest.json structure that was introduced in [create-react-app v3.2.0](https://github.com/facebook/create-react-app/releases/tag/v3.2.0). If your React app was built using an eariler version of create-react-app, you will need to update your React app.
