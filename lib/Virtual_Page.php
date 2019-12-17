@@ -54,6 +54,13 @@ class Virtual_Page {
 	private $callback;
 
 	/**
+	 * An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
+	 *
+	 * @var array
+	 */
+	private $wp_permalinks;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
@@ -61,14 +68,16 @@ class Virtual_Page {
 	 * @param string   $plugin_dir_path The absolute path to the plugin directory that contains the react app.
 	 * @param string   $role            The role required to view the page.
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
+	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
-	public function create( $slug, $root_id, $plugin_dir_path, $role, $callback ) {
+	public function create( $slug, $root_id, $plugin_dir_path, $role, $callback, $wp_permalinks ) {
 		$this->slug            = $slug;
 		$this->root_id         = $root_id;
 		$this->plugin_dir_path = $plugin_dir_path;
 		$this->role            = $role;
 		$this->key             = "react_app_$slug";
 		$this->callback        = $callback;
+		$this->wp_permalinks   = $wp_permalinks;
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
@@ -116,8 +125,15 @@ class Virtual_Page {
 	 * This means when using a shortcode in a page, you will no longer be able to have any children page/posts permalinks.
 	 */
 	public function disable_wp_rewrite() : void {
+		$regex_pattern = '^' . $this->slug . '/(.*)$';
+
+		if ( ! empty( $this->wp_permalinks ) ) {
+			$ignored_permalinks = implode( "|", $this->wp_permalinks );
+			$regex_pattern      = '^' . $this->slug . '/(?!' . $ignored_permalinks . ')(.*)$';
+		}
+
 		add_rewrite_rule(
-			'^' . $this->slug . '/(.*)$',
+			$regex_pattern,
 			'index.php?' . $this->key . '=1',
 			'top'
 		);
