@@ -128,7 +128,7 @@ class Virtual_Page {
 		$regex_pattern = '^' . $this->slug . '/(.*)$';
 
 		if ( ! empty( $this->wp_permalinks ) ) {
-			$ignored_permalinks = implode( "|", $this->wp_permalinks );
+			$ignored_permalinks = implode( '|', $this->wp_permalinks );
 			$regex_pattern      = '^' . $this->slug . '/(?!' . $ignored_permalinks . ')(.*)$';
 		}
 
