@@ -67,6 +67,8 @@ The `register` method has 4 required parameters and should be called within the 
 | $plugin_dir_path  | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
 | $role             | string   | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
 | $callback         | callable | Optional callback function. This is only fired on the registered page before the React app assets are enqueued.                                                                                                                                                                                                           |
+| $wp_permalinks    | array    | Optional array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
+                                                                                                                    |
 
 ## Usage
 
