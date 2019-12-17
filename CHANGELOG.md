@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2019-12-17
+
+### Added
+
+- New optional argument. An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
+
 ## [1.1.0] - 2019-11-27
 
 ### Added
