@@ -150,7 +150,7 @@ class Virtual_Page {
 			function( $request ) {
 				if ( array_key_exists( $this->key, $request ) ) {
 					$react_app_loader_request = [
-						$this->key => '1'
+						$this->key => '1',
 					];
 					return $react_app_loader_request;
 				}
