@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       React App Loader
  * Description:       An mu-plugin that provides an API for loading React applications built with create-react-app into the front-end of WordPress.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Author:            Masonite
  * Author URI:        https://www.masonite.com/
  * License:           GPL-2.0+
