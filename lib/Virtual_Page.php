@@ -125,7 +125,6 @@ class Virtual_Page {
 
 	/**
 	 * Prevent WordPress from thinking that react app routes are separate WordPress pages.
-	 * This means when using a shortcode in a page, you will no longer be able to have any children page/posts permalinks.
 	 */
 	public function disable_wp_rewrite() : void {
 		$regex_pattern = '^' . $this->slug . '/(.*)$';
