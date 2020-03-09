@@ -81,6 +81,7 @@ class Virtual_Page {
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
+		$this->handle_request();
 		$this->reserve_slug();
 	}
 
@@ -134,36 +135,47 @@ class Virtual_Page {
 			$regex_pattern      = '^' . $this->slug . '/(?!' . $ignored_permalinks . ')(.*)$';
 		}
 
-		/**
-		 * Have WordPress ignore all URL query variables if the request is explicity for a
-		 * registered React application.
-		 *
-		 * This prevents any conflicts with WordPress' reservered terms and query vars used
-		 * by a registered React application.
-		 *
-		 * i.e.
-		 *    `?p=3` may be intended to be page 3 of some paginated results within React
-		 *     but WordPress thinks we want to go get a post with ID=3.
-		 *
-		 * @link https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms
-		 */
-		add_filter(
-			'request',
-			function( $request ) {
-				if ( array_key_exists( $this->key, $request ) ) {
-					$react_app_loader_request = [
-						$this->key => '1',
-					];
-					return $react_app_loader_request;
-				}
-				return $request;
-			}
-		);
-
 		add_rewrite_rule(
 			$regex_pattern,
 			'index.php?' . $this->key . '=1',
 			'top'
+		);
+	}
+
+	/**
+	 * Handles various aspects of updating requests to our virtual pages.
+	 */
+	public function handle_request() : void {
+		add_filter(
+			'request',
+			function( $request ) {
+				// Do nothing if this is not a request for a registered React app.
+				if ( ! array_key_exists( $this->key, $request ) ) {
+					return $request;
+				}
+
+				// Remove the trailing slash from our URL.
+				self::remove_trailing_slash();
+
+				/**
+				 * Have WordPress ignore all URL query variables if the request is explicity for a
+				 * registered React application.
+				 *
+				 * This prevents any conflicts with WordPress' reservered terms and query vars used
+				 * by a registered React application.
+				 *
+				 * i.e.
+				 *    `?p=3` may be intended to be page 3 of some paginated results within React
+				 *     but WordPress thinks we want to go get a post with ID=3.
+				 *
+				 * @link https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms
+				 */
+				$react_app_loader_request = [
+					$this->key => '1',
+				];
+
+				return $react_app_loader_request;
+			}
 		);
 	}
 
@@ -223,6 +235,19 @@ class Virtual_Page {
 
 				return $updated_classes;
 			}
+		);
+	}
+
+	/**
+	 * Removes the trailing slash from current request URL.
+	 */
+	public static function remove_trailing_slash() {
+		add_filter(
+			'user_trailingslashit',
+			function( $string ) {
+				return untrailingslashit( $string );
+			},
+			1
 		);
 	}
 
