@@ -75,7 +75,7 @@ class Virtual_Page {
 		$this->root_id         = $root_id;
 		$this->plugin_dir_path = $plugin_dir_path;
 		$this->role            = $role;
-		$this->key             = "react_app_$slug";
+		$this->key             = basename( $plugin_dir_path );
 		$this->callback        = $callback;
 		$this->wp_permalinks   = $wp_permalinks;
 
@@ -89,6 +89,14 @@ class Virtual_Page {
 	 */
 	public function generate_page() : void {
 		add_filter(
+			'query_vars',
+			function( $query_vars ) {
+				$query_vars[] = $this->key;
+				return $query_vars;
+			}
+		);
+
+		add_filter(
 			'generate_rewrite_rules',
 			function ( $wp_rewrite ) {
 				$wp_rewrite->rules = array_merge(
@@ -98,20 +106,15 @@ class Virtual_Page {
 			}
 		);
 
-		add_filter(
-			'query_vars',
-			function( $query_vars ) {
-				$query_vars[] = $this->key;
-				return $query_vars;
-			}
-		);
-
 		add_action(
 			'template_redirect',
 			function() {
 				$query_var = intval( get_query_var( $this->key ) );
 
 				if ( $query_var ) {
+					// Update our theme body classes.
+					$this->update_body_classes();
+
 					// Display our page content.
 					self::display_page_content();
 					die;
@@ -203,6 +206,25 @@ class Virtual_Page {
 			$is_bad_slug = true;
 		}
 		return $is_bad_slug;
+	}
+
+	/**
+	 * Add body class to theme to better identify this page type.
+	 */
+	public function update_body_classes() {
+		add_filter(
+			'body_class',
+			function( $classes ) {
+				$plugin_body_classes = [
+					'react-app-loader',
+					$this->key,
+				];
+
+				$updated_classes = array_merge( $classes, $plugin_body_classes );
+
+				return $updated_classes;
+			}
+		);
 	}
 
 	/**
