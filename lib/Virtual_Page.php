@@ -75,12 +75,13 @@ class Virtual_Page {
 		$this->root_id         = $root_id;
 		$this->plugin_dir_path = $plugin_dir_path;
 		$this->role            = $role;
-		$this->key             = "react_app_$slug";
+		$this->key             = basename( $plugin_dir_path );
 		$this->callback        = $callback;
 		$this->wp_permalinks   = $wp_permalinks;
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
+		$this->handle_request();
 		$this->reserve_slug();
 	}
 
@@ -88,6 +89,14 @@ class Virtual_Page {
 	 * Create the virtual page the react app with live within.
 	 */
 	public function generate_page() : void {
+		add_filter(
+			'query_vars',
+			function( $query_vars ) {
+				$query_vars[] = $this->key;
+				return $query_vars;
+			}
+		);
+
 		add_filter(
 			'generate_rewrite_rules',
 			function ( $wp_rewrite ) {
@@ -98,20 +107,15 @@ class Virtual_Page {
 			}
 		);
 
-		add_filter(
-			'query_vars',
-			function( $query_vars ) {
-				$query_vars[] = $this->key;
-				return $query_vars;
-			}
-		);
-
 		add_action(
 			'template_redirect',
 			function() {
 				$query_var = intval( get_query_var( $this->key ) );
 
 				if ( $query_var ) {
+					// Update our theme body classes.
+					$this->update_body_classes();
+
 					// Display our page content.
 					self::display_page_content();
 					die;
@@ -122,7 +126,6 @@ class Virtual_Page {
 
 	/**
 	 * Prevent WordPress from thinking that react app routes are separate WordPress pages.
-	 * This means when using a shortcode in a page, you will no longer be able to have any children page/posts permalinks.
 	 */
 	public function disable_wp_rewrite() : void {
 		$regex_pattern = '^' . $this->slug . '/(.*)$';
@@ -132,36 +135,47 @@ class Virtual_Page {
 			$regex_pattern      = '^' . $this->slug . '/(?!' . $ignored_permalinks . ')(.*)$';
 		}
 
-		/**
-		 * Have WordPress ignore all URL query variables if the request is explicity for a
-		 * registered React application.
-		 *
-		 * This prevents any conflicts with WordPress' reservered terms and query vars used
-		 * by a registered React application.
-		 *
-		 * i.e.
-		 *    `?p=3` may be intended to be page 3 of some paginated results within React
-		 *     but WordPress thinks we want to go get a post with ID=3.
-		 *
-		 * @link https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms
-		 */
-		add_filter(
-			'request',
-			function( $request ) {
-				if ( array_key_exists( $this->key, $request ) ) {
-					$react_app_loader_request = [
-						$this->key => '1',
-					];
-					return $react_app_loader_request;
-				}
-				return $request;
-			}
-		);
-
 		add_rewrite_rule(
 			$regex_pattern,
 			'index.php?' . $this->key . '=1',
 			'top'
+		);
+	}
+
+	/**
+	 * Handles various aspects of updating requests to our virtual pages.
+	 */
+	public function handle_request() : void {
+		add_filter(
+			'request',
+			function( $request ) {
+				// Do nothing if this is not a request for a registered React app.
+				if ( ! array_key_exists( $this->key, $request ) ) {
+					return $request;
+				}
+
+				// Remove the trailing slash from our URL.
+				self::remove_trailing_slash();
+
+				/**
+				 * Have WordPress ignore all URL query variables if the request is explicity for a
+				 * registered React application.
+				 *
+				 * This prevents any conflicts with WordPress' reservered terms and query vars used
+				 * by a registered React application.
+				 *
+				 * i.e.
+				 *    `?p=3` may be intended to be page 3 of some paginated results within React
+				 *     but WordPress thinks we want to go get a post with ID=3.
+				 *
+				 * @link https://codex.wordpress.org/Function_Reference/register_taxonomy#Reserved_Terms
+				 */
+				$react_app_loader_request = [
+					$this->key => '1',
+				];
+
+				return $react_app_loader_request;
+			}
 		);
 	}
 
@@ -203,6 +217,38 @@ class Virtual_Page {
 			$is_bad_slug = true;
 		}
 		return $is_bad_slug;
+	}
+
+	/**
+	 * Add body class to theme to better identify this page type.
+	 */
+	public function update_body_classes() {
+		add_filter(
+			'body_class',
+			function( $classes ) {
+				$plugin_body_classes = [
+					'react-app-loader',
+					$this->key,
+				];
+
+				$updated_classes = array_merge( $classes, $plugin_body_classes );
+
+				return $updated_classes;
+			}
+		);
+	}
+
+	/**
+	 * Removes the trailing slash from current request URL.
+	 */
+	public static function remove_trailing_slash() {
+		add_filter(
+			'user_trailingslashit',
+			function( $string ) {
+				return untrailingslashit( $string );
+			},
+			1
+		);
 	}
 
 	/**

@@ -61,14 +61,13 @@ Example:
 The `register` method has 4 required parameters and should be called within the [`plugins_loaded`](https://codex.wordpress.org/Plugin_API/Action_Reference/plugins_loaded) action.
 
 | Parameter         | Type     | Description                                                                                                                                                                                                                                                                                                               |
-| :---------------- | :-----   | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| $slug             | string   | The page slug where the React app will live on the site. The loader will also reserve this slug with WordPress, preventing any new posts from being made at the same URL. If any existing posts share the defined slug, they will not be able to be accessed on the front-end of the site once rewrite rules are flushed. |
-| $root_id          | string   | The id of the root element that the React app should mount to. By default, Create React App has this as `'root'`.                                                                                                                                                                                                         |
-| $plugin_dir_path  | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
-| $role             | string   | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
-| $callback         | callable | Optional callback function. This is only fired on the registered page before the React app assets are enqueued.                                                                                                                                                                                                           |
-| $wp_permalinks    | array    | Optional array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
-                                                                                                                    |
+| :---------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| \$slug            | string   | The page slug where the React app will live on the site. The loader will also reserve this slug with WordPress, preventing any new posts from being made at the same URL. If any existing posts share the defined slug, they will not be able to be accessed on the front-end of the site once rewrite rules are flushed. |
+| \$root_id         | string   | The id of the root element that the React app should mount to. By default, Create React App has this as `'root'`.                                                                                                                                                                                                         |
+| \$plugin_dir_path | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
+| \$role            | string   | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
+| \$callback        | callable | Optional callback function. This is only fired on the registered page before the React app assets are enqueued.                                                                                                                                                                                                           |
+| \$wp_permalinks   | array    | Optional array of subdirectories off of the defined slug that we DO WANT WordPress to handle.                                                                                                                                                                                                                             |
 
 ## Usage
 
@@ -85,7 +84,11 @@ add_action( 'plugins_loaded', function() {
 });
 ```
 
-### Flushing WordPress Rewrite Rules
+### URL Structure
+
+When a React plugin is registered with this loader plugin, a [virtual page](https://metabox.io/how-to-create-a-virtual-page-in-wordpress/) is created within WordPress. As a result, this new page will not show up within the regular pages/posts list in wp-admin. Because of the nature of creating a virtual page by adding new rewrite rules to WordPress, the rewrite rules will need to be flushed before the new page will be accessible.
+
+#### Flushing WordPress Rewrite Rules
 
 You'll need to refresh your site's rewrite rules in the database before you will see any React apps registered with the loader. This can be done by visiting your site's permalinks settings page in the admin area.
 
@@ -98,6 +101,10 @@ Rewrite rules can also be flushed via [WP-CLI](https://developer.wordpress.org/c
 ```sh
 wp rewrite flush
 ```
+
+#### Trailing Slash
+
+Trailing slash has been removed for registerd React app pages. This was done in an effort to create consistency in behavior with create-react-app's node-server structure (the environment that fires up when you run `npm start`).
 
 ## Recommendations
 
@@ -151,11 +158,11 @@ Once implemented, our base styles will now be scoped under the root hashed compo
 
 ## Common Issues
 
-__I am getting a 404 when hitting the page slug I registered.__
+**I am getting a 404 when hitting the page slug I registered.**
 
 Verify that your React app WordPress plugin has been activated. Your site's rewrite rules might not have been flushed or flushed properly. See [Flushing WordPress Rewrite Rules](#flushing-wordpress-rewrite-rules) for instructions.
 
-__I am able to hit the page slug I registered, but my React app is not loading.__
+**I am able to hit the page slug I registered, but my React app is not loading.**
 
 This could be happening from a few things:
 
@@ -165,7 +172,7 @@ This could be happening from a few things:
 
 3.  The asset-manfiest.json could not be found at all within your React app. Most likely your React app was never built or the build failed.
 
-__I am being redirected to my site's homepage when trying to access the page slug I registered.__
+**I am being redirected to my site's homepage when trying to access the page slug I registered.**
 
 This happens when your current WordPress user does not have the same role that was defined when registering with the loader.
 
