@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added new theme body classes `react-app-loader` and `{plugin directory name}` for registered React app pages.
+
+### Changed
+
+- Removed trailing slash for registered React app pages
+
+### Fixed
+
+- Removed enqueue_scripts dependency of `react` &amp; `react-dom` from WordPress core since those are already bundled in create-react-app.
+
 ## [1.2.1] - 2020-03-03
 
 ### Fixed
