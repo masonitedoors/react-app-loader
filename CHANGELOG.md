@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2020-03-10
+
 ### Added
 
 - Added new theme body classes `react-app-loader` and `{plugin directory name}` for registered React app pages.
