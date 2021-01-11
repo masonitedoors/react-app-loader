@@ -113,6 +113,22 @@ class Assets {
 	}
 
 	/**
+	 * Check if the string is a valid URL.
+	 *
+	 * @param string $possible_url String to check if a URL.
+	 * @return boolean
+	 */
+	private static function is_url( string $possible_url ) {
+		$parts = parse_url( $possible_url );
+
+		if ( isset( $parts['host'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Check a directory for a root or build asset manifest file, and attempt to
 	 * decode and return the asset list JSON if found.
 	 *
@@ -120,15 +136,30 @@ class Assets {
 	 * @return array|null;
 	 */
 	public static function get_assets_list( string $directory ) {
+		$assets    = [];
 		$directory = trailingslashit( $directory );
 
-		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
-		$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
+		// Check if remotely hosted React app.
+		if ( self::is_url( $directory ) ) {
+			$base_url = $directory;
+			$url      = $base_url . 'asset-manifest'; // .json delibritately omitted since it's a node server.
+			$response = wp_remote_get( $url );
 
-		if ( $root_manifest ) {
-			$assets = self::load_asset_file( $directory . 'asset-manifest.json' );
+			if ( is_wp_error( $response ) ) {
+				return;
+			}
+
+			$body   = wp_remote_retrieve_body( $response );
+			$assets = json_decode( $body );
 		} else {
-			$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
+			// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
+			$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
+
+			if ( $root_manifest ) {
+				$assets = self::load_asset_file( $directory . 'asset-manifest.json' );
+			} else {
+				$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
+			}
 		}
 
 		if ( ! empty( $assets ) ) {
