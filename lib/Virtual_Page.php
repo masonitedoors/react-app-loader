@@ -25,11 +25,11 @@ class Virtual_Page {
 	private $root_id;
 
 	/**
-	 * The absolute path to the plugin directory that contains the react app.
+	 * The absolute path or URL to the plugin directory that contains the CRA based react app.
 	 *
 	 * @var string
 	 */
-	private $plugin_dir_path;
+	private $cra_directory;
 
 	/**
 	 * The user role required to view to view this page.
@@ -65,17 +65,17 @@ class Virtual_Page {
 	 *
 	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
 	 * @param string   $root_id         The id of the root element we will be mounting our react app to.
-	 * @param string   $plugin_dir_path The absolute path to the plugin directory that contains the react app.
+	 * @param string   $cra_directory   The absolute path or URL to the plugin directory that contains the CRA based react app.
 	 * @param string   $role            The role required to view the page.
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
-	public function create( $slug, $root_id, $plugin_dir_path, $role, $callback, $wp_permalinks ) {
+	public function create( $slug, $root_id, $cra_directory, $role, $callback, $wp_permalinks ) {
 		$this->slug            = $slug;
 		$this->root_id         = $root_id;
-		$this->plugin_dir_path = $plugin_dir_path;
+		$this->cra_directory   = $cra_directory;
 		$this->role            = $role;
-		$this->key             = basename( $plugin_dir_path );
+		$this->key             = basename( $cra_directory );
 		$this->callback        = $callback;
 		$this->wp_permalinks   = $wp_permalinks;
 
@@ -265,7 +265,7 @@ class Virtual_Page {
 		}
 
 		$assets = new Assets();
-		$assets->enqueue( $this->plugin_dir_path );
+		$assets->enqueue( $this->cra_directory );
 
 		// Fire our callback if one is defined.
 		if ( false !== $this->callback ) {

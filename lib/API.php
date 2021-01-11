@@ -15,20 +15,20 @@ class API {
 	 *
 	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
 	 * @param string   $root_id         The id of the root element we will be mounting our react app to.
-	 * @param string   $plugin_dir_path The absolute path to the plugin directory that contains the react app.
+	 * @param string   $cra_directory   The absolute path or URL to the plugin directory that contains the CRA based react app.
 	 * @param string   $role            The role required to view the page.
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
-	public static function register( $slug, $root_id, $plugin_dir_path, $role, $callback = false, $wp_permalinks = [] ) : void {
+	public static function register( $slug, $root_id, $cra_directory, $role, $callback = false, $wp_permalinks = [] ) : void {
 		add_action(
 			'init',
-			function() use ( $slug, $root_id, $plugin_dir_path, $role, $callback, $wp_permalinks ) {
+			function() use ( $slug, $root_id, $cra_directory, $role, $callback, $wp_permalinks ) {
 				$virtual_page = new Virtual_Page();
 				$virtual_page->create(
 					$slug,
 					$root_id,
-					$plugin_dir_path,
+					$cra_directory,
 					$role,
 					$callback,
 					$wp_permalinks
