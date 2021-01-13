@@ -245,7 +245,7 @@ class Virtual_Page {
 	 * @return boolean
 	 */
 	private static function is_url( string $possible_url ) {
-		$parts = parse_url( $possible_url );
+		$parts = wp_parse_url( $possible_url );
 
 		if ( isset( $parts['host'] ) ) {
 			return true;
