@@ -25,11 +25,11 @@ class Virtual_Page {
 	private $root_id;
 
 	/**
-	 * The absolute path to the plugin directory that contains the react app.
+	 * The absolute path to the plugin directory that has the CRA based react app. Can also be a URL to a remote CRA base react app.
 	 *
 	 * @var string
 	 */
-	private $plugin_dir_path;
+	private $cra_directory;
 
 	/**
 	 * The user role required to view to view this page.
@@ -65,19 +65,19 @@ class Virtual_Page {
 	 *
 	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
 	 * @param string   $root_id         The id of the root element we will be mounting our react app to.
-	 * @param string   $plugin_dir_path The absolute path to the plugin directory that contains the react app.
+	 * @param string   $cra_directory   The absolute path to the plugin directory that has the CRA based react app. Can also be a URL to a remote CRA base react app.
 	 * @param string   $role            The role required to view the page.
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
-	public function create( $slug, $root_id, $plugin_dir_path, $role, $callback, $wp_permalinks ) {
-		$this->slug            = $slug;
-		$this->root_id         = $root_id;
-		$this->plugin_dir_path = $plugin_dir_path;
-		$this->role            = $role;
-		$this->key             = basename( $plugin_dir_path );
-		$this->callback        = $callback;
-		$this->wp_permalinks   = $wp_permalinks;
+	public function create( $slug, $root_id, $cra_directory, $role, $callback, $wp_permalinks ) {
+		$this->slug          = $slug;
+		$this->root_id       = $root_id;
+		$this->cra_directory = $cra_directory;
+		$this->role          = $role;
+		$this->key           = basename( $cra_directory );
+		$this->callback      = $callback;
+		$this->wp_permalinks = $wp_permalinks;
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
@@ -88,7 +88,7 @@ class Virtual_Page {
 	/**
 	 * Create the virtual page the react app with live within.
 	 */
-	public function generate_page() : void {
+	public function generate_page(): void {
 		add_filter(
 			'query_vars',
 			function( $query_vars ) {
@@ -127,7 +127,7 @@ class Virtual_Page {
 	/**
 	 * Prevent WordPress from thinking that react app routes are separate WordPress pages.
 	 */
-	public function disable_wp_rewrite() : void {
+	public function disable_wp_rewrite(): void {
 		$regex_pattern = '^' . $this->slug . '/(.*)$';
 
 		if ( ! empty( $this->wp_permalinks ) ) {
@@ -145,7 +145,7 @@ class Virtual_Page {
 	/**
 	 * Handles various aspects of updating requests to our virtual pages.
 	 */
-	public function handle_request() : void {
+	public function handle_request(): void {
 		add_filter(
 			'request',
 			function( $request ) {
@@ -189,7 +189,7 @@ class Virtual_Page {
 	 * In the case of a bad (i.e conflicting slug), WordPress appends a "-2" to
 	 * the permalink.
 	 */
-	public function reserve_slug() : void {
+	public function reserve_slug(): void {
 		add_filter( 'wp_unique_post_slug_is_bad_hierarchical_slug', [ $this, 'fe_prevent_slug_conflict' ], 10, 4 );
 		add_filter( 'wp_unique_post_slug_is_bad_flat_slug', [ $this, 'fe_prevent_slug_conflict' ], 10, 3 );
 	}
@@ -239,6 +239,22 @@ class Virtual_Page {
 	}
 
 	/**
+	 * Check if the string is a valid URL.
+	 *
+	 * @param string $possible_url String to check if a URL.
+	 * @return boolean
+	 */
+	private static function is_url( string $possible_url ) {
+		$parts = wp_parse_url( $possible_url );
+
+		if ( isset( $parts['host'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Removes the trailing slash from current request URL.
 	 */
 	public static function remove_trailing_slash() {
@@ -254,7 +270,7 @@ class Virtual_Page {
 	/**
 	 * Handles the displaying of our virtual page content.
 	 */
-	public function display_page_content() : void {
+	public function display_page_content(): void {
 		// Redirect user to homepage if they do not have permissions.
 		$user = wp_get_current_user();
 
@@ -265,7 +281,13 @@ class Virtual_Page {
 		}
 
 		$assets = new Assets();
-		$assets->enqueue( $this->plugin_dir_path );
+
+		// Handle the loading of assets from a remote URL or a local plugin.
+		if ( self::is_url( $this->cra_directory ) ) {
+			$assets->enqueue_remote( $this->cra_directory );
+		} else {
+			$assets->enqueue( $this->cra_directory );
+		}
 
 		// Fire our callback if one is defined.
 		if ( false !== $this->callback ) {

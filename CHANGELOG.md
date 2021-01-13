@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2021-01-13
+
+### Added
+
+- Added support for loading a remote react app.
+
 ## [1.3.0] - 2020-03-10
 
 ### Added
