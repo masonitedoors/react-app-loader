@@ -239,6 +239,22 @@ class Virtual_Page {
 	}
 
 	/**
+	 * Check if the string is a valid URL.
+	 *
+	 * @param string $possible_url String to check if a URL.
+	 * @return boolean
+	 */
+	private static function is_url( string $possible_url ) {
+		$parts = parse_url( $possible_url );
+
+		if ( isset( $parts['host'] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Removes the trailing slash from current request URL.
 	 */
 	public static function remove_trailing_slash() {
@@ -265,7 +281,12 @@ class Virtual_Page {
 		}
 
 		$assets = new Assets();
-		$assets->enqueue( $this->cra_directory );
+
+		if ( self::is_url( $this->cra_directory ) ) {
+			$assets->enqueue_remote( $this->cra_directory );
+		} else {
+			$assets->enqueue( $this->cra_directory );
+		}
 
 		// Fire our callback if one is defined.
 		if ( false !== $this->callback ) {

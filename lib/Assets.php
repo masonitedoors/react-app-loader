@@ -93,6 +93,39 @@ class Assets {
 	}
 
 	/**
+	 * Enqueue our remote react app assets.
+	 *
+	 * @param string $base_url Base URL to our remote react app.
+	 */
+	public function enqueue_remote( $base_url ) : void {
+		$url      = trailingslashit( $base_url ) . 'asset-manifest'; // .json delibritately omitted since we expect custom  node server endpoint.
+		$response = wp_remote_get( $url );
+
+		if ( is_wp_error( $response ) ) {
+			return;
+		}
+
+		$body   = wp_remote_retrieve_body( $response );
+		$assets = json_decode( $body );
+
+		if ( empty( $assets ) ) {
+			return;
+		}
+
+		foreach ( $assets as $asset_url ) {
+			$is_js  = preg_match( '/\.js$/', $asset_url );
+			$is_css = preg_match( '/\.css$/', $asset_url );
+			$handle = sanitize_key( basename( $asset_url ) );
+
+			if ( $is_js ) {
+				wp_enqueue_script( $handle, $asset_url, [], null, true );
+			} elseif ( $is_css ) {
+				wp_enqueue_style( $handle, $asset_url, [] );
+			}
+		}
+	}
+
+	/**
 	 * Attempt to load a file at the specified path and parse its contents as JSON.
 	 *
 	 * @param string $path The path to the JSON file to load.
@@ -113,22 +146,6 @@ class Assets {
 	}
 
 	/**
-	 * Check if the string is a valid URL.
-	 *
-	 * @param string $possible_url String to check if a URL.
-	 * @return boolean
-	 */
-	private static function is_url( string $possible_url ) {
-		$parts = parse_url( $possible_url );
-
-		if ( isset( $parts['host'] ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check a directory for a root or build asset manifest file, and attempt to
 	 * decode and return the asset list JSON if found.
 	 *
@@ -139,27 +156,13 @@ class Assets {
 		$assets    = [];
 		$directory = trailingslashit( $directory );
 
-		// Check if remotely hosted React app.
-		if ( self::is_url( $directory ) ) {
-			$base_url = $directory;
-			$url      = $base_url . 'asset-manifest'; // .json delibritately omitted since it's a node server.
-			$response = wp_remote_get( $url );
+		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
+		$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
 
-			if ( is_wp_error( $response ) ) {
-				return;
-			}
-
-			$body   = wp_remote_retrieve_body( $response );
-			$assets = json_decode( $body );
+		if ( $root_manifest ) {
+			$assets = self::load_asset_file( $directory . 'asset-manifest.json' );
 		} else {
-			// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
-			$root_manifest = file_exists( $directory . 'build/asset-manifest.json' ) ? false : true;
-
-			if ( $root_manifest ) {
-				$assets = self::load_asset_file( $directory . 'asset-manifest.json' );
-			} else {
-				$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
-			}
+			$assets = self::load_asset_file( $directory . 'build/asset-manifest.json' );
 		}
 
 		if ( ! empty( $assets ) ) {
@@ -175,6 +178,7 @@ class Assets {
 				},
 				array_values( $assets['entrypoints'] )
 			);
+
 			return $filtered_assets;
 		}
 
