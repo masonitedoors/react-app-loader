@@ -153,7 +153,6 @@ class Assets {
 	 * @return array|null;
 	 */
 	public static function get_assets_list( string $directory ) {
-		$assets    = [];
 		$directory = trailingslashit( $directory );
 
 		// Check if asset-manifest.json is exists in the root of the react app or within a build subdirectory.
@@ -178,7 +177,6 @@ class Assets {
 				},
 				array_values( $assets['entrypoints'] )
 			);
-
 			return $filtered_assets;
 		}
 
