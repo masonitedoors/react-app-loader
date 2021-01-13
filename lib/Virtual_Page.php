@@ -71,13 +71,13 @@ class Virtual_Page {
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
 	public function create( $slug, $root_id, $cra_directory, $role, $callback, $wp_permalinks ) {
-		$this->slug            = $slug;
-		$this->root_id         = $root_id;
-		$this->cra_directory   = $cra_directory;
-		$this->role            = $role;
-		$this->key             = basename( $cra_directory );
-		$this->callback        = $callback;
-		$this->wp_permalinks   = $wp_permalinks;
+		$this->slug          = $slug;
+		$this->root_id       = $root_id;
+		$this->cra_directory = $cra_directory;
+		$this->role          = $role;
+		$this->key           = basename( $cra_directory );
+		$this->callback      = $callback;
+		$this->wp_permalinks = $wp_permalinks;
 
 		$this->generate_page();
 		$this->disable_wp_rewrite();
@@ -88,7 +88,7 @@ class Virtual_Page {
 	/**
 	 * Create the virtual page the react app with live within.
 	 */
-	public function generate_page() : void {
+	public function generate_page(): void {
 		add_filter(
 			'query_vars',
 			function( $query_vars ) {
@@ -127,7 +127,7 @@ class Virtual_Page {
 	/**
 	 * Prevent WordPress from thinking that react app routes are separate WordPress pages.
 	 */
-	public function disable_wp_rewrite() : void {
+	public function disable_wp_rewrite(): void {
 		$regex_pattern = '^' . $this->slug . '/(.*)$';
 
 		if ( ! empty( $this->wp_permalinks ) ) {
@@ -145,7 +145,7 @@ class Virtual_Page {
 	/**
 	 * Handles various aspects of updating requests to our virtual pages.
 	 */
-	public function handle_request() : void {
+	public function handle_request(): void {
 		add_filter(
 			'request',
 			function( $request ) {
@@ -189,7 +189,7 @@ class Virtual_Page {
 	 * In the case of a bad (i.e conflicting slug), WordPress appends a "-2" to
 	 * the permalink.
 	 */
-	public function reserve_slug() : void {
+	public function reserve_slug(): void {
 		add_filter( 'wp_unique_post_slug_is_bad_hierarchical_slug', [ $this, 'fe_prevent_slug_conflict' ], 10, 4 );
 		add_filter( 'wp_unique_post_slug_is_bad_flat_slug', [ $this, 'fe_prevent_slug_conflict' ], 10, 3 );
 	}
@@ -270,7 +270,7 @@ class Virtual_Page {
 	/**
 	 * Handles the displaying of our virtual page content.
 	 */
-	public function display_page_content() : void {
+	public function display_page_content(): void {
 		// Redirect user to homepage if they do not have permissions.
 		$user = wp_get_current_user();
 

@@ -20,7 +20,7 @@ class API {
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
 	 */
-	public static function register( $slug, $root_id, $cra_directory, $role, $callback = false, $wp_permalinks = [] ) : void {
+	public static function register( $slug, $root_id, $cra_directory, $role, $callback = false, $wp_permalinks = [] ): void {
 		add_action(
 			'init',
 			function() use ( $slug, $root_id, $cra_directory, $role, $callback, $wp_permalinks ) {
