@@ -98,19 +98,7 @@ class Assets {
 	 * @param string $base_url Base URL to our remote react app.
 	 */
 	public function enqueue_remote( $base_url ): void {
-		$url      = trailingslashit( $base_url ) . 'asset-manifest'; // .json delibritately omitted since we expect custom node server endpoint.
-		$response = wp_remote_get( $url );
-
-		if ( is_wp_error( $response ) ) {
-			return;
-		}
-
-		$body   = wp_remote_retrieve_body( $response );
-		$assets = json_decode( $body );
-
-		if ( empty( $assets ) ) {
-			return;
-		}
+		$assets = self::fetch_remote_assets( $base_url );
 
 		foreach ( $assets as $asset_url ) {
 			$is_js  = preg_match( '/\.js$/', $asset_url );
@@ -126,10 +114,47 @@ class Assets {
 	}
 
 	/**
+	 * Makes a GET request to the remote react app to fetch the asset-manifest.json.
+	 * Returns an array of entrypoints but with absolute URLs.
+	 *
+	 * @param string $base_url
+	 * @return array
+	 */
+	private static function fetch_remote_assets( $base_url ) {
+		$url      = trailingslashit( $base_url ) . 'asset-manifest.json';
+		$response = wp_remote_get( $url );
+
+		if ( is_wp_error( $response ) ) {
+			return [];
+		}
+
+		$body   = wp_remote_retrieve_body( $response );
+		$assets = json_decode( $body, true );
+
+		if ( empty( $assets ) ) {
+			return [];
+		}
+
+		if ( ! array_key_exists( 'entrypoints', $assets ) ) {
+			trigger_error( 'React App Loader: Entrypoints key was not found within your react app\'s asset-manifest.json. This may indicate that you are using an unsupported version of react-scripts. Your react app should be using react-scripts@3.2.0 or later.', E_USER_WARNING ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+			return [];
+		}
+
+		$filtered_assets = array_map(
+			function( $asset_path ) use ( $base_url ) {
+				return "$base_url/$asset_path";
+			},
+			array_values( $assets['entrypoints'] )
+		);
+
+		return $filtered_assets;
+	}
+
+	/**
 	 * Attempt to load a file at the specified path and parse its contents as JSON.
 	 *
 	 * @param string $path The path to the JSON file to load.
-	 * @return array|null;
+	 * @return array|null
 	 */
 	public static function load_asset_file( $path ) {
 		if ( ! file_exists( $path ) ) {
@@ -150,7 +175,7 @@ class Assets {
 	 * decode and return the asset list JSON if found.
 	 *
 	 * @param string $directory Root directory containing `src` and `build` directory.
-	 * @return array|null;
+	 * @return array|null
 	 */
 	public static function get_assets_list( string $directory ) {
 		$directory = trailingslashit( $directory );
