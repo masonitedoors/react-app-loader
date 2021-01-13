@@ -110,6 +110,7 @@ Trailing slash has been removed for registerd React app pages. This was done in 
 Support for loading React apps hosted on other websites is available as of version __1.4.0__.
 
 This can be achived by using a URL to the root of the React app For the 3rd argument in the register method.
+If your React app's asset-manifest.json is https://example.org/my-react-app/asset-manifest.json, use the first part of the URL that does not include asset-manifest.json.
 
 ```php
 add_action( 'plugins_loaded', function() {
@@ -120,20 +121,6 @@ add_action( 'plugins_loaded', function() {
         'nopriv'
     );
 });
-```
-
-At the current time, this does require your react app to have a custom JSON route at https://example.org/my-react-app/asset-manifest that lists an array of absolute URLs to all required JS + CSS.
-Note that the required route should be `asset-manifest` and not `asset-manifest.json`.
-
-Example response:
-```JSON
-[
-  "https://example.org/my-react-app/static/js/runtime-main.093eb518.js",
-  "https://example.org/my-react-app/static/css/2.f524894f.chunk.css",
-  "https://example.org/my-react-app/static/js/2.3f418d71.chunk.js",
-  "https://example.org/my-react-app/static/css/main.b73ceddb.chunk.css",
-  "https://example.org/my-react-app/static/js/main.74a90f56.chunk.js"
-]
 ```
 
 ## Recommendations
