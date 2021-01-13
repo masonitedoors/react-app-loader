@@ -282,6 +282,7 @@ class Virtual_Page {
 
 		$assets = new Assets();
 
+		// Handle the loading of assets from a remote URL or a local plugin.
 		if ( self::is_url( $this->cra_directory ) ) {
 			$assets->enqueue_remote( $this->cra_directory );
 		} else {

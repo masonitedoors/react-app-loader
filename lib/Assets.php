@@ -98,7 +98,7 @@ class Assets {
 	 * @param string $base_url Base URL to our remote react app.
 	 */
 	public function enqueue_remote( $base_url ) : void {
-		$url      = trailingslashit( $base_url ) . 'asset-manifest'; // .json delibritately omitted since we expect custom  node server endpoint.
+		$url      = trailingslashit( $base_url ) . 'asset-manifest'; // .json delibritately omitted since we expect custom node server endpoint.
 		$response = wp_remote_get( $url );
 
 		if ( is_wp_error( $response ) ) {
