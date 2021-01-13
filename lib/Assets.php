@@ -117,7 +117,7 @@ class Assets {
 	 * Makes a GET request to the remote react app to fetch the asset-manifest.json.
 	 * Returns an array of entrypoints but with absolute URLs.
 	 *
-	 * @param string $base_url
+	 * @param string $base_url The base URL for the asset-manifest.json.
 	 * @return array
 	 */
 	private static function fetch_remote_assets( $base_url ) {
