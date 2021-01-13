@@ -64,7 +64,7 @@ The `register` method has 4 required parameters and should be called within the 
 | :---------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | \$slug            | string   | The page slug where the React app will live on the site. The loader will also reserve this slug with WordPress, preventing any new posts from being made at the same URL. If any existing posts share the defined slug, they will not be able to be accessed on the front-end of the site once rewrite rules are flushed. |
 | \$root_id         | string   | The id of the root element that the React app should mount to. By default, Create React App has this as `'root'`.                                                                                                                                                                                                         |
-| \$plugin_dir_path | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`.                                                                                                                                                                                  |
+| \$cra_directory   | string   | The absolute path to the plugin directory that contains the react app. In most situations, this should be `plugin_dir_path( __FILE__ )`. This can also be a URL to the base directory of a React app on a different website.                                                                                              |
 | \$role            | string   | The WordPress user role required to view the page. If a user tries to access the page without this role, they will be redirected to the site's [home_url()](https://developer.wordpress.org/reference/functions/home_url/). If no authentication is needed, this should be set as `'nopriv'`.                             |
 | \$callback        | callable | Optional callback function. This is only fired on the registered page before the React app assets are enqueued.                                                                                                                                                                                                           |
 | \$wp_permalinks   | array    | Optional array of subdirectories off of the defined slug that we DO WANT WordPress to handle.                                                                                                                                                                                                                             |
@@ -83,7 +83,6 @@ add_action( 'plugins_loaded', function() {
     );
 });
 ```
-
 ### URL Structure
 
 When a React plugin is registered with this loader plugin, a [virtual page](https://metabox.io/how-to-create-a-virtual-page-in-wordpress/) is created within WordPress. As a result, this new page will not show up within the regular pages/posts list in wp-admin. Because of the nature of creating a virtual page by adding new rewrite rules to WordPress, the rewrite rules will need to be flushed before the new page will be accessible.
@@ -105,6 +104,37 @@ wp rewrite flush
 #### Trailing Slash
 
 Trailing slash has been removed for registerd React app pages. This was done in an effort to create consistency in behavior with create-react-app's node-server structure (the environment that fires up when you run `npm start`).
+
+#### Remote React App Support
+
+Support for loading React apps hosted on other websites is available as of version __1.4.0__.
+
+This can be achived by using a URL to the root of the React app For the 3rd argument in the register method.
+
+```php
+add_action( 'plugins_loaded', function() {
+    \ReactAppLoader\API::register(
+        'my-react-app-slug',
+        'root',
+        'https://example.org/my-react-app/',
+        'nopriv'
+    );
+});
+```
+
+At the current time, this does require your react app to have a custom JSON route at https://example.org/my-react-app/asset-manifest that lists an array of absolute URLs to all required JS + CSS.
+Note that the required route should be `asset-manifest` and not `asset-manifest.json`.
+
+Example response:
+```JSON
+[
+  "https://example.org/my-react-app/static/js/runtime-main.093eb518.js",
+  "https://example.org/my-react-app/static/css/2.f524894f.chunk.css",
+  "https://example.org/my-react-app/static/js/2.3f418d71.chunk.js",
+  "https://example.org/my-react-app/static/css/main.b73ceddb.chunk.css",
+  "https://example.org/my-react-app/static/js/main.74a90f56.chunk.js"
+]
+```
 
 ## Recommendations
 
