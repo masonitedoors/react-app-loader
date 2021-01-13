@@ -25,7 +25,7 @@ class Virtual_Page {
 	private $root_id;
 
 	/**
-	 * The absolute path or URL to the plugin directory that contains the CRA based react app.
+	 * The absolute path to the plugin directory that has the CRA based react app. Can also be a URL to a remote CRA base react app.
 	 *
 	 * @var string
 	 */
@@ -65,7 +65,7 @@ class Virtual_Page {
 	 *
 	 * @param string   $slug            The slug to tell WordPress to stop handling so react can handle routing.
 	 * @param string   $root_id         The id of the root element we will be mounting our react app to.
-	 * @param string   $cra_directory   The absolute path or URL to the plugin directory that contains the CRA based react app.
+	 * @param string   $cra_directory   The absolute path to the plugin directory that has the CRA based react app. Can also be a URL to a remote CRA base react app.
 	 * @param string   $role            The role required to view the page.
 	 * @param callable $callback        The callback function that fires before assets are enqueued to the page.
 	 * @param array    $wp_permalinks   An array of subdirectories off of the defined slug that we DO WANT WordPress to handle.
