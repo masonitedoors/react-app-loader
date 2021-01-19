@@ -105,7 +105,7 @@ wp rewrite flush
 
 Trailing slash has been removed for registerd React app pages. This was done in an effort to create consistency in behavior with create-react-app's node-server structure (the environment that fires up when you run `npm start`).
 
-#### Remote React App Support
+### Remote React App Support
 
 Support for loading React apps hosted on other websites is available as of version __1.4.0__.
 
