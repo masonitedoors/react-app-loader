@@ -154,9 +154,6 @@ class Virtual_Page {
 					return $request;
 				}
 
-				// Remove the trailing slash from our URL.
-				self::remove_trailing_slash();
-
 				/**
 				 * Have WordPress ignore all URL query variables if the request is explicity for a
 				 * registered React application.
@@ -252,19 +249,6 @@ class Virtual_Page {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Removes the trailing slash from current request URL.
-	 */
-	public static function remove_trailing_slash() {
-		add_filter(
-			'user_trailingslashit',
-			function( $string ) {
-				return untrailingslashit( $string );
-			},
-			1
-		);
 	}
 
 	/**
